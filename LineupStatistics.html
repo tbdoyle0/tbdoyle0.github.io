@@ -2,88 +2,114 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hamilton College Men's Basketball</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/flatly/bootstrap.min.css" rel="stylesheet">
-  <style>
-    h1, h3 {
-      font-family: 'Roboto', sans-serif;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hamilton College - Men's Basketball</title>
+    
+    <!-- Include Bootstrap theme for flatly style -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
-    h1 {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-
-    h3 {
-      margin-top: 0;
-    }
-
-    .sidebar {
-      max-width: 300px;
-    }
-  </style>
+    <!-- Include custom CSS -->
+    <style>
+        h1, h3 {
+            font-family: 'Roboto', sans-serif;
+        }
+        h1 {
+            font-weight: bold;  /* Make h1 bold */
+            margin-bottom: 5px; /* Reduce space below the title */
+        }
+        h3 {
+            margin-top: 0; /* Remove space above the subtitle */
+        }
+        .sidebar {
+            max-width: 300px; /* Maximum width for the sidebar */
+        }
+        .main-content {
+            margin-left: 320px;
+        }
+    </style>
 </head>
 
 <body>
-  <div class="container">
-    <!-- Application title -->
-    <h1>Hamilton College</h1>
-    <h3>Men's Basketball</h3>
-
-    <div class="row">
-      <!-- Sidebar -->
-      <div class="col-md-3 sidebar">
-        <div class="form-group">
-          <label for="filter">Filter by:</label>
-          <div>
-            <input type="radio" id="filter_all" name="filter" value="all" onclick="showTable('all')" checked>
-            <label for="filter_all">All games</label>
-          </div>
-          <div>
-            <input type="radio" id="filter_last" name="filter" value="last" onclick="showTable('last')">
-            <label for="filter_last">Last 5 games</label>
-          </div>
-          <div>
-            <input type="radio" id="filter_close" name="filter" value="close" onclick="showTable('close')">
-            <label for="filter_close">2nd half close games</label>
-          </div>
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="row">
+            <div class="col">
+                <h1>Hamilton College</h1>
+                <h3>Men's Basketball</h3>
+            </div>
         </div>
-      </div>
+        
+        <!-- Sidebar and Main content layout -->
+        <div class="row">
+            <!-- Sidebar with filter options -->
+            <div class="col-md-3 sidebar">
+                <h4>Filter by:</h4>
+                <form id="filterForm">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="filter" id="all" value="all" checked>
+                        <label class="form-check-label" for="all">
+                            All games
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="filter" id="last" value="last">
+                        <label class="form-check-label" for="last">
+                            Last 5 games
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="filter" id="close" value="close">
+                        <label class="form-check-label" for="close">
+                            2nd half close games
+                        </label>
+                    </div>
+                </form>
+            </div>
 
-      <!-- Main panel -->
-      <div class="col-md-9">
-        <h3>Lineup Statistics</h3>
-        <div id="table-container">
-          <iframe id="results_all" src="results_all.html" style="width: 100%; height: 500px; border: none;"></iframe>
-          <iframe id="results_last" src="results_last.html" style="width: 100%; height: 500px; border: none; display: none;"></iframe>
-          <iframe id="results_close" src="results_close.html" style="width: 100%; height: 500px; border: none; display: none;"></iframe>
+            <!-- Main content area -->
+            <div class="col-md-9 main-content">
+                <h3>Lineup Statistics</h3>
+                <!-- Table outputs as iframes for the filtered content -->
+                <div id="tableOutput">
+                    <iframe src="results_all.html" style="width: 100%; height: 400px; border: none;"></iframe>
+                </div>
+
+                <!-- Last update text -->
+                <div id="lastUpdate" style="margin-top: 20px;">
+                    <p><strong>Last update:</strong> <span id="lastUpdateText">Loading...</span></p>
+                </div>
+            </div>
         </div>
-        <p id="time">Last update: <span id="last-update">Loading...</span></p>
-      </div>
     </div>
-  </div>
 
-  <script>
-    // Function to show the corresponding table based on the selected filter
-    function showTable(filter) {
-      document.getElementById("results_all").style.display = filter === "all" ? "block" : "none";
-      document.getElementById("results_last").style.display = filter === "last" ? "block" : "none";
-      document.getElementById("results_close").style.display = filter === "close" ? "block" : "none";
-    }
+    <!-- Include JavaScript -->
+    <script>
+        // Load last update text from the txt file (this requires a backend or AJAX call)
+        fetch('last_update.txt')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('lastUpdateText').textContent = data;
+            });
 
-    // Load the timestamp from last_update.txt
-    fetch('last_update.txt')
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('last-update').textContent = data.trim();
-      })
-      .catch(error => {
-        console.error('Error loading last update timestamp:', error);
-        document.getElementById('last-update').textContent = "Error loading timestamp.";
-      });
-  </script>
+        // Handle filter selection and load corresponding iframe
+        const filterRadios = document.querySelectorAll('input[name="filter"]');
+        filterRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                const filterValue = event.target.value;
+                let iframeSrc = 'results_all.html'; // Default to "all"
+                
+                if (filterValue === 'last') {
+                    iframeSrc = 'results_last.html';
+                } else if (filterValue === 'close') {
+                    iframeSrc = 'results_close.html';
+                }
+                
+                document.getElementById('tableOutput').innerHTML = `<iframe src="${iframeSrc}" style="width: 100%; height: 400px; border: none;"></iframe>`;
+            });
+        });
+    </script>
 </body>
 
 </html>

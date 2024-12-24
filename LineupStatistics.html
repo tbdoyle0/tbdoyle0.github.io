@@ -60,17 +60,29 @@
           <iframe id="results_last" src="results_last.html" style="width: 100%; height: 500px; border: none; display: none;"></iframe>
           <iframe id="results_close" src="results_close.html" style="width: 100%; height: 500px; border: none; display: none;"></iframe>
         </div>
-        <p id="time">Last update: <!-- Add your timestamp here --></p>
+        <p id="time">Last update: <span id="last-update">Loading...</span></p>
       </div>
     </div>
   </div>
 
   <script>
+    // Function to show the corresponding table based on the selected filter
     function showTable(filter) {
       document.getElementById("results_all").style.display = filter === "all" ? "block" : "none";
       document.getElementById("results_last").style.display = filter === "last" ? "block" : "none";
       document.getElementById("results_close").style.display = filter === "close" ? "block" : "none";
     }
+
+    // Load the timestamp from last_update.txt
+    fetch('last_update.txt')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('last-update').textContent = data.trim();
+      })
+      .catch(error => {
+        console.error('Error loading last update timestamp:', error);
+        document.getElementById('last-update').textContent = "Error loading timestamp.";
+      });
   </script>
 </body>
 

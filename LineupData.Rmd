@@ -1,0 +1,404 @@
+---
+title: "HamiltonLineupData"
+author: "Tim Doyle"
+date: "2024-12-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list = ls(all.names = TRUE))
+library(shiny)
+library(DT)
+library(tidyverse)
+library(rvest)
+library(zoo)
+library(shinythemes)
+library(scales)
+library(shinybusy)
+```
+
+```{r inputs, echo=FALSE}
+last_update <- format(Sys.time(), format = "%m/%d/%y %H:%M")
+schedule_site <- "https://athletics.hamilton.edu/sports/mens-basketball/schedule"
+main_site <- "https://athletics.hamilton.edu"
+team_id <- c("ham", "hamilton", "hamilton college") # Need to look through play-by-play column heading to identify all variations
+team_total <- 749
+opponent_total <- 650
+leader_name <- "H. MORGAN"
+leader_total <- 189
+box_score_id <- "Hamilton"   # Find unique identifier for school name that will map to the proper team in the box score
+title <- "Hamilton College"
+subtitle <- "Men's Basketball"
+```
+
+```{r functions, echo=FALSE}
+analyze <- function(link){
+  # Scrape play by play tables  
+  tables <- read_html(link) %>%
+    html_elements("#play-by-play") %>%
+    html_elements("table") %>%  
+    html_table() %>%
+    lapply(change_names)
+
+  df <- lapply(tables, data.frame) %>%
+    lapply(assign_time) %>%
+    lapply(trim) %>%
+    lapply(fill_in) %>%
+    lapply(remove_margin) %>%
+    lapply(convert)
+
+  # Add time to the first half data
+  df[[1]] <- add_minutes(df[[1]])
+
+  # Add an indicator to label which half
+  df <- lapply(seq_along(df), function(i){
+    df <- df[[i]]
+    df$half <- i
+    return(df)
+  })
+
+  df <- df %>%
+    bind_rows() %>%
+    assign_score() %>%
+    calc_time()
+  
+  # Scrape box score to find date and add to data
+  date <- read_html(link) %>%
+    html_elements(".game-details") %>%
+    html_elements("dd") %>%
+    html_text2()
+
+  df$game.date <- as.Date(date[1], format = "%m/%d/%y")
+  
+
+  df <- df %>% 
+    home_away() %>%
+    scoring_data() %>% 
+    organize_plays()
+
+  starters <- find_starters(link)
+  
+  df <- df %>% 
+    add_starters(starters) %>%
+    handle_subs()
+  
+  # df <- df[-c(1:9)]
+  
+  return(df)
+  
+}
+
+# Format column names
+change_names <- function(tb){
+  tb %>%
+    rename_with(~ gsub(" ", ".", tolower(.)), everything())
+}
+
+# For actions that occur at the same time, assign the time of the first action to all actions in the sequence
+assign_time <- function(df){
+  df$time.remaining <- na.locf(ifelse(df$time.remaining == "--", NA, df$time.remaining), na.rm = FALSE)
+  return(df)
+}
+
+# Remove extra spaces for the scores
+trim <- function(df){
+  df$home.team.score <- str_trim(df$home.team.score)
+  df$away.team.score <- str_trim(df$away.team.score)
+  return(df)
+}
+
+# Fill in blank scores with NA
+fill_in <- function(df){
+  df$home.team.score <- ifelse(df$home.team.score == "", NA, df$home.team.score)
+  df$away.team.score <- ifelse(df$away.team.score == "", NA, df$away.team.score)
+  return(df)
+}
+
+# Remove margin from scores
+remove_margin <- function(df){
+  df$home.team.score <- str_remove(df$home.team.score, "\\s*\\(.*\\)")
+  df$away.team.score <- str_remove(df$away.team.score, "\\s*\\(.*\\)")
+  return(df)
+}
+
+# Convert scores to numeric
+convert <- function(df){
+  df$home.team.score <- as.numeric(df$home.team.score)
+  df$away.team.score <- as.numeric(df$away.team.score)
+  return(df)
+}
+
+# Add 20 minutes to the first half times
+add_minutes <- function(df){
+  df$time.remaining <- ifelse(
+    !is.na(df$time.remaining),
+    as.character(format(strptime(df$time.remaining, format = "%M:%S") + 20 * 60, "%M:%S")),
+    NA
+    )
+  return(df)
+}
+
+# Assign score to missing values
+assign_score <- function(df){
+  df$home.team.score <- na.locf(df$home.team.score, na.rm = FALSE)
+  df$home.team.score <- ifelse(is.na(df$home.team.score), 0, df$home.team.score)
+  df$away.team.score <- na.locf(df$away.team.score, na.rm = FALSE)
+  df$away.team.score <- ifelse(is.na(df$away.team.score), 0, df$away.team.score)
+  return(df)
+}
+
+# Reformat time and calculate time elapsed
+calc_time <- function(df){
+  df$time.remaining <- as.POSIXct(df$time.remaining, format = "%M:%S", origin = "1970-01-01")
+  df$time.elapsed <- abs(as.numeric(difftime(df$time.remaining, lag(df$time.remaining), units = "secs")))
+  df$time.elapsed <- ifelse(is.na(df$time.elapsed), difftime(as.POSIXct("40:00", format = "%M:%S", origin = "1970-01-01"), df$time.remaining),df$time.elapsed)
+  return(df)
+}
+
+# Identify whether the team is home or away and assign columns accordingly
+home_away <- function(df){
+  position <- which(names(df) == "away.team.score")
+  prior_column <- names(df)[position -1]
+  if(prior_column %in% team_id) names(df)[position - 1] <- "team" else names(df)[position + 3] <- "team"
+  if(prior_column %in% team_id) names(df)[position + 3] <- "opponent" else names(df)[position - 1] <- "opponent"
+  df$team.score <- if(prior_column %in% team_id) df$away.team.score else df$home.team.score
+  df$opponent.score <- if(prior_column %in% team_id) df$home.team.score else df$away.team.score
+  df$home.or.away <- if(prior_column %in% team_id) "away" else "home"
+  return(df)
+}
+
+# Calculate incremental score and score differential
+scoring_data <- function (df){
+  df <- df %>%
+    mutate(team.score.inc = team.score - lag(team.score),
+           opponent.score.inc = opponent.score - lag(opponent.score))
+  df$team.score.inc <- ifelse(is.na(df$team.score.inc), df$team.score, df$team.score.inc)
+  df$opponent.score.inc <- ifelse(is.na(df$opponent.score.inc), df$opponent.score, df$opponent.score.inc)
+  df$score.diff <- df$team.score - df$opponent.score
+  return(df)
+  
+}
+
+# Organize actions and players from play-by-play data
+organize_plays <- function(df){
+  df <- df %>%
+    mutate(action = str_extract(team, "^[^by]*"), # Extract everything before 'by'
+           action = str_trim(action), # Trim any trailing spaces
+           action = ifelse(action == "", NA, action), # Assign NA to blanks
+           player = str_extract(team, "(?<=by ).*?(?=\\(|$)"), # Extract everything after 'by' and before '(' or end of string
+           player = str_trim(player), # Trim any trailing spaces
+           player = str_replace(player, "^(\\w+)\\s*,\\s*(\\w)(\\w+)", "\\2. \\1") #Rearrange to first initial and last name
+    )
+  return(df)
+}
+
+# Scrape box score to find starters
+find_starters <- function(link){
+  page <- read_html(link)
+  xpath_query <- paste0("//h3[contains(text(), '", box_score_id, "')]/following-sibling::table")
+  box_table <- page %>%
+    html_node(xpath = xpath_query) %>%
+    html_table(fill = TRUE) %>%
+    rename_with(~ tolower(.))
+  box_table$player <- box_table$player %>%
+    str_replace_all("^[0-9]+\\s", "") %>%                        # Remove the number and space
+    str_replace("^(\\w+)\\s*,\\s*(\\w)(\\w+)", "\\2. \\1") %>%      # Extract first initial and last name
+    toupper()
+  starters_list <- box_table %>%
+    filter(gs == "*") %>%
+    pull(player)
+  return(starters_list)
+}
+
+# Add starters to play-by-play data
+add_starters <- function(df, list){
+  df <- df %>%
+    mutate(on.court = NA,
+           on.court = ifelse(row_number() == 1, paste(list, collapse = ", "), on.court)
+           )
+  return(df)
+}
+
+# Sub players in and out of the lineup based on play-by-play data
+handle_subs <- function(df){
+  df <- df %>%
+    mutate(on.court = purrr::accumulate(seq_along(action), function(prev, i) {
+      if (is.na(action[i])) {
+        return(prev) # No change if action is NA
+      }
+      if (action[i] == "SUB OUT") {
+        # Remove player from previous row, including trailing comma and space if present
+        updated_court <- gsub(
+          pattern = paste0("\\b", player[i], "\\b,?\\s?"), 
+          replacement = "", 
+          x = prev
+        )
+        # Clean up extra spaces or trailing commas
+        return(trimws(gsub(",\\s*$", "", updated_court)))
+      }
+      if (action[i] == "SUB IN") {
+        if (prev == ""){
+          return(player[i])
+        }
+        # Add player to the previous row
+        else if (grepl(player[i], prev)) {
+          return(prev) # Don't add duplicates
+        }
+        return(paste(prev, player[i], sep = ", "))
+      }
+      return(prev)
+    }, .init = df$on.court[1])[-1]) # Exclude the initial value from accumulate
+  return(df)
+}
+```
+
+```{r main, echo=FALSE}
+# Identify available box score links
+game_links <- read_html(schedule_site) %>%
+  html_elements(".noprint") %>%
+  html_elements(".sidearm-schedule-game-links-boxscore") %>%
+  html_element("a") %>%
+  html_attr("href") %>%
+  paste(main_site, ., sep = "") %>%
+  unique()
+
+# Analyze box score data
+master <- lapply(game_links, analyze) %>%
+  bind_rows()
+
+# Gather the dates for the most recent five games
+recent_five_dates <- master %>%
+  distinct(game.date) %>%          # Get unique dates
+  arrange(desc(game.date)) %>%     # Sort dates in descending order
+  slice_head(n = 5) %>%       # Select the top 5 dates
+  pull(game.date) 
+
+# Determine all unique 5 player lineup combinations
+unique_lineups <- master %>%
+  # Split the on.court column into individual names
+  mutate(names_list = str_split(on.court, ", ")) %>%
+  # Sort the names alphabetically in each row
+  mutate(sorted_names = map(names_list, ~ sort(.x))) %>%
+  # Collapse sorted names back into a single string (to compare lineups easily)
+  mutate(lineup_key = map_chr(sorted_names, ~ paste(.x, collapse = ", "))) %>%
+  # Filter for rows where exactly 5 names are present
+  filter(map_int(names_list, length) == 5) %>%
+  # Select unique lineups based on the sorted key
+  distinct(lineup_key) %>%
+  pull(lineup_key)
+
+ # Check time accounted for and team, opponent, and leading scorer total points
+check_time_accounted <- percent(sum(master$time.elapsed) / (n_distinct(master$game.date) * 40 * 60), accuracy = 0.0001) # This doesn't exactly add up to 40min*GP because the seconds between the last record and end of game are not accounted for
+check_team <- sum(master$team.score.inc) - team_total
+check_opponent <- sum(master$opponent.score.inc) - opponent_total
+check_leader <- sum(master$team.score.inc[master$player == leader_name], na.rm = TRUE) - leader_total
+
+# Aggregate results for each unique lineup combination and filter option
+results_all <- map_dfr(unique_lineups, function(lineup) {
+  # Split lineup into names
+  lineup_names <- str_split(lineup, ", ") %>% unlist()
+
+  # Filter rows where all lineup names are present in on.court
+  summary_stats <- master %>%
+    filter(
+      map_lgl(on.court, function(oc) {
+      court_names <- str_split(oc, ", ") %>% unlist()
+      setequal(lineup_names, court_names) # Check if sets are identical
+    })) %>%
+    summarise(total_seconds = sum(time.elapsed, na.rm = TRUE),
+              total_scored = sum(team.score.inc, na.rm = TRUE),
+              total_against = sum(opponent.score.inc, na.rm = TRUE),
+              total_net = total_scored - total_against)
+  tibble("Lineup" = lineup,
+         "Minutes Played" = round(summary_stats$total_seconds / 60, digits = 0),
+         "Points Scored" = summary_stats$total_scored,
+         "Points Allowed" = summary_stats$total_against,
+         "+/-" = summary_stats$total_net)
+}) %>%
+  filter(`Minutes Played` > 0) %>%
+  datatable(rownames = FALSE, 
+            options = list(
+              pageLength = 20,
+              order = list(list(1, 'desc')),
+              columnDefs = list(list(targets = 0, orderable = FALSE))
+            )
+  )
+
+results_last <- map_dfr(unique_lineups, function(lineup) {
+  # Split lineup into names
+  lineup_names <- str_split(lineup, ", ") %>% unlist()
+  
+  # Filter rows where all lineup names are present in on.court
+  summary_stats <- master %>%
+    filter(
+      game.date %in% recent_five_dates,
+      map_lgl(on.court, function(oc) {
+        court_names <- str_split(oc, ", ") %>% unlist()
+        setequal(lineup_names, court_names) # Check if sets are identical
+      })) %>%
+    summarise(total_seconds = sum(time.elapsed, na.rm = TRUE),
+              total_scored = sum(team.score.inc, na.rm = TRUE),
+              total_against = sum(opponent.score.inc, na.rm = TRUE),
+              total_net = total_scored - total_against)
+  tibble("Lineup" = lineup,
+         "Minutes Played" = round(summary_stats$total_seconds / 60, digits = 0),
+         "Points Scored" = summary_stats$total_scored,
+         "Points Allowed" = summary_stats$total_against,
+         "+/-" = summary_stats$total_net)
+}) %>%
+  filter(`Minutes Played` > 0) %>%
+  datatable(rownames = FALSE, 
+            options = list(
+              pageLength = 20,
+              order = list(list(1, 'desc')),
+              columnDefs = list(list(targets = 0, orderable = FALSE))
+            )
+  )
+
+results_close <- map_dfr(unique_lineups, function(lineup) {
+  # Split lineup into names
+  lineup_names <- str_split(lineup, ", ") %>% unlist()
+  
+  # Filter rows where all lineup names are present in on.court
+  summary_stats <- master %>%
+    filter(
+      half == 2 & abs(score.diff) <= 5,
+      map_lgl(on.court, function(oc) {
+        court_names <- str_split(oc, ", ") %>% unlist()
+        setequal(lineup_names, court_names) # Check if sets are identical
+      })) %>%
+    summarise(total_seconds = sum(time.elapsed, na.rm = TRUE),
+              total_scored = sum(team.score.inc, na.rm = TRUE),
+              total_against = sum(opponent.score.inc, na.rm = TRUE),
+              total_net = total_scored - total_against)
+  tibble("Lineup" = lineup,
+         "Minutes Played" = round(summary_stats$total_seconds / 60, digits = 0),
+         "Points Scored" = summary_stats$total_scored,
+         "Points Allowed" = summary_stats$total_against,
+         "+/-" = summary_stats$total_net)
+}) %>%
+  filter(`Minutes Played` > 0) %>%
+  datatable(rownames = FALSE, 
+            options = list(
+              pageLength = 20,
+              order = list(list(1, 'desc')),
+              columnDefs = list(list(targets = 0, orderable = FALSE))
+            )
+  ) 
+
+
+saveWidget(results_all, "results_all.html", selfcontained = TRUE)
+saveWidget(results_last, "results_last.html", selfcontained = TRUE)
+saveWidget(results_close, "results_close.html", selfcontained = TRUE)
+write(last_update, file = "last_update.txt")
+```
+
+
+
+
+
+
+
+
+

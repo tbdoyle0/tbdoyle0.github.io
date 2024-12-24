@@ -325,8 +325,9 @@ results_all <- map_dfr(unique_lineups, function(lineup) {
               columnDefs = list(list(targets = 0, orderable = FALSE)),
               dom = 'ftip',
               initComplete = JS(
-                "function(settings, json){",
-                "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",
+                "function(settings, json) {",
+                "$('div.dataTables_filter input').attr('placeholder', 'Search');",  # Add placeholder text
+                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "}"
               )
             )
@@ -363,8 +364,9 @@ results_last <- map_dfr(unique_lineups, function(lineup) {
               columnDefs = list(list(targets = 0, orderable = FALSE)),
               dom = 'ftip',
               initComplete = JS(
-                "function(settings, json){",
-                "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",
+                "function(settings, json) {",
+                "$('div.dataTables_filter input').attr('placeholder', 'Search');",  # Add placeholder text
+                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "}"
               )
             )
@@ -401,8 +403,9 @@ results_close <- map_dfr(unique_lineups, function(lineup) {
               columnDefs = list(list(targets = 0, orderable = FALSE)),
               dom = 'ftip',
               initComplete = JS(
-                "function(settings, json){",
-                "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",
+                "function(settings, json) {",
+                "$('div.dataTables_filter input').attr('placeholder', 'Search');",  # Add placeholder text
+                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "}"
               )
             )

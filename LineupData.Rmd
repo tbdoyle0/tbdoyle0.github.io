@@ -310,13 +310,13 @@ results_all <- map_dfr(unique_lineups, function(lineup) {
               total_scored = sum(team.score.inc, na.rm = TRUE),
               total_against = sum(opponent.score.inc, na.rm = TRUE),
               total_net = total_scored - total_against)
-  tibble("Lineup" = lineup,
-         "Minutes Played" = round(summary_stats$total_seconds / 60, digits = 0),
-         "Points Scored" = summary_stats$total_scored,
-         "Points Allowed" = summary_stats$total_against,
+  tibble("LINEUP" = lineup,
+         "MINUTES PLAYED" = round(summary_stats$total_seconds / 60, digits = 0),
+         "POINTS SCORED" = summary_stats$total_scored,
+         "POINTS ALLOWED" = summary_stats$total_against,
          "+/-" = summary_stats$total_net)
 }) %>%
-  filter(`Minutes Played` > 0) %>%
+  filter(`MINUTES PLAYED` > 0) %>%
   datatable(rownames = FALSE, 
             options = list(
               pageLength = 20,
@@ -348,13 +348,13 @@ results_last <- map_dfr(unique_lineups, function(lineup) {
               total_scored = sum(team.score.inc, na.rm = TRUE),
               total_against = sum(opponent.score.inc, na.rm = TRUE),
               total_net = total_scored - total_against)
-  tibble("Lineup" = lineup,
-         "Minutes Played" = round(summary_stats$total_seconds / 60, digits = 0),
-         "Points Scored" = summary_stats$total_scored,
-         "Points Allowed" = summary_stats$total_against,
+  tibble("LINEUP" = lineup,
+         "MINUTES PLAYED" = round(summary_stats$total_seconds / 60, digits = 0),
+         "POINT SCORED" = summary_stats$total_scored,
+         "POINTS ALLOWED" = summary_stats$total_against,
          "+/-" = summary_stats$total_net)
 }) %>%
-  filter(`Minutes Played` > 0) %>%
+  filter(`MINUTES PLAYED` > 0) %>%
   datatable(rownames = FALSE, 
             options = list(
               pageLength = 20,
@@ -392,7 +392,7 @@ results_close <- map_dfr(unique_lineups, function(lineup) {
          "POINTS ALLOWED" = summary_stats$total_against,
          "+/-" = summary_stats$total_net)
 }) %>%
-  filter(`Minutes Played` > 0) %>%
+  filter(`MINUTES PLAYED` > 0) %>%
   datatable(rownames = FALSE, 
             options = list(
               pageLength = 20,

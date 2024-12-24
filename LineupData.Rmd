@@ -316,22 +316,7 @@ results_all <- map_dfr(unique_lineups, function(lineup) {
          "POINTS ALLOWED" = summary_stats$total_against,
          "+/-" = summary_stats$total_net)
 }) %>%
-  filter(`MINUTES PLAYED` > 0) %>%
-  datatable(rownames = FALSE, 
-            options = list(
-              pageLength = 20,
-              lengthChange = FALSE,
-              order = list(list(1, 'desc')),
-              columnDefs = list(list(targets = 0, orderable = FALSE)),
-              dom = 'ftip',
-              initComplete = JS(
-                "function(settings, json) {",
-                "$('div.dataTables_filter input').attr('placeholder', 'Search');",  # Add placeholder text
-                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
-                "}"
-              )
-            )
-  )
+  filter(`MINUTES PLAYED` > 0) 
 
 results_last <- map_dfr(unique_lineups, function(lineup) {
   # Split lineup into names
@@ -355,22 +340,7 @@ results_last <- map_dfr(unique_lineups, function(lineup) {
          "POINTS ALLOWED" = summary_stats$total_against,
          "+/-" = summary_stats$total_net)
 }) %>%
-  filter(`MINUTES PLAYED` > 0) %>%
-  datatable(rownames = FALSE, 
-            options = list(
-              pageLength = 20,
-              lengthChange = FALSE,
-              order = list(list(1, 'desc')),
-              columnDefs = list(list(targets = 0, orderable = FALSE)),
-              dom = 'ftip',
-              initComplete = JS(
-                "function(settings, json) {",
-                "$('div.dataTables_filter input').attr('placeholder', 'Search');",  # Add placeholder text
-                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
-                "}"
-              )
-            )
-  )
+  filter(`MINUTES PLAYED` > 0) 
 
 results_close <- map_dfr(unique_lineups, function(lineup) {
   # Split lineup into names
@@ -394,8 +364,10 @@ results_close <- map_dfr(unique_lineups, function(lineup) {
          "POINTS ALLOWED" = summary_stats$total_against,
          "+/-" = summary_stats$total_net)
 }) %>%
-  filter(`MINUTES PLAYED` > 0) %>%
-  datatable(rownames = FALSE, 
+  filter(`MINUTES PLAYED` > 0)
+
+results_all <- results_all %>%
+    datatable(rownames = FALSE, 
             options = list(
               pageLength = 20,
               lengthChange = FALSE,
@@ -404,13 +376,46 @@ results_close <- map_dfr(unique_lineups, function(lineup) {
               dom = 'ftip',
               initComplete = JS(
                 "function(settings, json) {",
-                "$('div.dataTables_filter input').attr('placeholder', 'Search');",  # Add placeholder text
+                "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",  # Add placeholder text
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "}"
               )
             )
-  ) 
+  )
 
+results_last <- results_last %>%
+      datatable(rownames = FALSE, 
+            options = list(
+              pageLength = 20,
+              lengthChange = FALSE,
+              order = list(list(1, 'desc')),
+              columnDefs = list(list(targets = 0, orderable = FALSE)),
+              dom = 'ftip',
+              initComplete = JS(
+                "function(settings, json) {",
+                "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",  # Add placeholder text
+                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
+                "}"
+              )
+            )
+  )
+
+results_close <- results_close %>%
+      datatable(rownames = FALSE, 
+            options = list(
+              pageLength = 20,
+              lengthChange = FALSE,
+              order = list(list(1, 'desc')),
+              columnDefs = list(list(targets = 0, orderable = FALSE)),
+              dom = 'ftip',
+              initComplete = JS(
+                "function(settings, json) {",
+                "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",  # Add placeholder text
+                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
+                "}"
+              )
+            )
+  )
 
 saveWidget(results_all, "results_all.html", selfcontained = TRUE)
 saveWidget(results_last, "results_last.html", selfcontained = TRUE)

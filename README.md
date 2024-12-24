@@ -1,1 +1,3 @@
-# tbdoyle0.github.io
+# Lineup Statistics Tables
+
+Hamilton College Men's Basketball

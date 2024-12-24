@@ -391,8 +391,7 @@ results_close <- map_dfr(unique_lineups, function(lineup) {
 saveWidget(results_all, "results_all.html", selfcontained = TRUE)
 saveWidget(results_last, "results_last.html", selfcontained = TRUE)
 saveWidget(results_close, "results_close.html", selfcontained = TRUE)
-
-
+write(last_update, file = "last_update.txt")
 ```
 
 

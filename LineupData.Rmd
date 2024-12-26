@@ -380,14 +380,10 @@ results_all <- results_all %>%
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "}"
               )
-            ),
-            callback = JS(
-              "function(settings) {",
-              "$('head').append('<link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap\" rel=\"stylesheet\">');",
-              "$('table').css('font-family', 'Roboto, sans-serif');",  # Apply Roboto font to the table
-              "}"
-              )
-  )
+            )
+  ) %>%
+  formatStyle(columns = colnames(results_all),
+              fontFamily = "Roboto")
 
 results_last <- results_last %>%
       datatable(rownames = FALSE, 
@@ -403,14 +399,10 @@ results_last <- results_last %>%
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "}"
               )
-            ),
-            callback = JS(
-              "function(settings) {",
-              "$('head').append('<link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap\" rel=\"stylesheet\">');",
-              "$('table').css('font-family', 'Roboto, sans-serif');",  # Apply Roboto font to the table
-              "}"
-              )
-  )
+            )
+  ) %>%
+  formatStyle(columns = colnames(results_last),
+              fontFamily = "Roboto")
 
 results_close <- results_close %>%
       datatable(rownames = FALSE, 
@@ -426,14 +418,10 @@ results_close <- results_close %>%
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "}"
               )
-            ),
-            callback = JS(
-              "function(settings) {",
-              "$('head').append('<link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap\" rel=\"stylesheet\">');",
-              "$('table').css('font-family', 'Roboto, sans-serif');",  # Apply Roboto font to the table
-              "}"
-              )
-  )
+            )
+  ) %>%
+  formatStyle(columns = colnames(results_close),
+              fontFamily = "Roboto")
 
 saveWidget(results_all, "results_all.html", selfcontained = TRUE)
 saveWidget(results_last, "results_last.html", selfcontained = TRUE)

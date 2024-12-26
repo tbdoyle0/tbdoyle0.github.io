@@ -288,7 +288,7 @@ unique_lineups <- master %>%
   distinct(lineup_key) %>%
   pull(lineup_key)
 
- # Check time accounted for and team, opponent, and leading scorer total points
+ # Checks
 check_time_accounted <- percent(sum(master$time.elapsed) / (n_distinct(master$game.date) * 40 * 60), accuracy = 0.0001) # This doesn't exactly add up to 40min*GP because the seconds between the last record and end of game are not accounted for
 check_team <- sum(master$team.score.inc) - team_total
 check_opponent <- sum(master$opponent.score.inc) - opponent_total
@@ -315,8 +315,7 @@ results_all_df <- map_dfr(unique_lineups, function(lineup) {
          "POINTS SCORED" = summary_stats$total_scored,
          "POINTS ALLOWED" = summary_stats$total_against,
          "+/-" = summary_stats$total_net)
-}) %>%
-  filter(`MINUTES PLAYED` > 0) 
+}) 
 
 results_last_df <- map_dfr(unique_lineups, function(lineup) {
   # Split lineup into names
@@ -434,6 +433,31 @@ results_close <- results_close_df %>%
   ) %>%
   formatStyle(columns = colnames(results_close_df),
               fontFamily = "Roboto")
+
+# Final tables checks
+check_points_all <- sum(results_all_df$`POINTS SCORED`) - team_total
+check_time_all_accounted <- percent(
+  sum(results_all_df$`MINUTES PLAYED`) / 
+    ((sum(master$time.elapsed) - 
+        sum(master$time.elapsed[master$action == "SUB OUT"], na.rm = TRUE) - 
+        sum(master$time.elapsed[master$action == "SUB IN"], na.rm = TRUE)) / 
+       60), 
+  accuracy = 0.0001)
+check_time_last_accounted <-  percent(
+  sum(results_last_df$`MINUTES PLAYED`) / 
+    ((sum(master %>% filter(game.date %in% recent_five_dates) %>% pull(time.elapsed)) - 
+      sum(master %>% filter(game.date %in% recent_five_dates, action == "SUB OUT") %>% pull(time.elapsed), na.rm = TRUE) - 
+      sum(master %>% filter(game.date %in% recent_five_dates, action == "SUB IN") %>% pull(time.elapsed), na.rm = TRUE)) /
+       60),
+  accuracy = 0.0001)
+
+check_time_close_accounted <- percent(
+  sum(results_close_df$`MINUTES PLAYED`) / 
+    ((sum(master %>% filter(half == 2, abs(score.diff) <= 5) %>% pull(time.elapsed)) - 
+      sum(master %>% filter(half == 2, abs(score.diff) <= 5, action == "SUB OUT") %>% pull(time.elapsed), na.rm = TRUE) - 
+      sum(master %>% filter(half == 2, abs(score.diff) <= 5, action == "SUB IN") %>% pull(time.elapsed), na.rm = TRUE)) /
+       60),
+  accuracy = 0.0001)
 
 saveWidget(results_all, "results_all.html", selfcontained = TRUE)
 saveWidget(results_last, "results_last.html", selfcontained = TRUE)

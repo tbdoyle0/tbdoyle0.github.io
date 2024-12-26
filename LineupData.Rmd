@@ -375,12 +375,17 @@ results_all <- results_all_df %>%
               dom = 'ftip',
               initComplete = JS(
                 "function(settings, json) {",
-                "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",  # Add placeholder text
-                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
-                "$('thead th').css({'font-family': 'Roboto'});",  # Apply font-family to headers
-                "$('.dataTables_info').css({'font-family': 'Roboto', 'color': '#333', 'font-size': '12px'});",  # Apply font-family to 'Showing X of Y entries'
-                "$('.dataTables_paginate').css({'font-family': 'Roboto', 'color': '#333', 'font-size': '12px'});", # Apply font-family to pagination
-                "$('.paginate_button').css({'font-family': 'Roboto', 'color': '#333', 'font-size': '12px'});", # Apply font-family to page buttons
+                "if (!document.getElementById('local-font-roboto')) {", 
+                "  var style = document.createElement('style');",
+                "  style.id = 'local-font-roboto';",
+                "  style.type = 'text/css';",
+                "  style.textContent = `@font-face { font-family: 'Roboto'; font-style: normal; font-weight: 400; src: url('/path/to/fonts/roboto.woff2') format('woff2'); }`;",
+                "  document.head.appendChild(style);",
+                "}",
+                "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",
+                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",
+                "$('thead th').css({'font-family': 'Roboto'});",
+                "$('.dataTables_info, .dataTables_paginate, .paginate_button').css({'font-family': 'Roboto', 'color': '#333', 'font-size': '12px'});",
                 "}"
               )
             )
@@ -398,12 +403,17 @@ results_last <- results_last_df %>%
               dom = 'ftip',
               initComplete = JS(
                 "function(settings, json) {",
-                "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",  # Add placeholder text
-                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
-                "$('thead th').css({'font-family': 'Roboto'});",  # Apply font-family to headers
-                "$('.dataTables_info').css({'font-family': 'Roboto', 'color': '#333', 'font-size': '12px'});",  # Apply font-family to 'Showing X of Y entries'
-                "$('.dataTables_paginate').css({'font-family': 'Roboto', 'color': '#333', 'font-size': '12px'});", # Apply font-family to pagination
-                "$('.paginate_button').css({'font-family': 'Roboto', 'color': '#333', 'font-size': '12px'});", # Apply font-family to page buttons
+                "if (!document.getElementById('local-font-roboto')) {", 
+                "  var style = document.createElement('style');",
+                "  style.id = 'local-font-roboto';",
+                "  style.type = 'text/css';",
+                "  style.textContent = `@font-face { font-family: 'Roboto'; font-style: normal; font-weight: 400; src: url('/path/to/fonts/roboto.woff2') format('woff2'); }`;",
+                "  document.head.appendChild(style);",
+                "}",
+                "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",
+                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",
+                "$('thead th').css({'font-family': 'Roboto'});",
+                "$('.dataTables_info, .dataTables_paginate, .paginate_button').css({'font-family': 'Roboto', 'color': '#333', 'font-size': '12px'});",
                 "}"
               )
             )
@@ -421,12 +431,17 @@ results_close <- results_close_df %>%
               dom = 'ftip',
               initComplete = JS(
                 "function(settings, json) {",
-                "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",  # Add placeholder text
-                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
-                "$('thead th').css({'font-family': 'Roboto'});",  # Apply font-family to headers
-                "$('.dataTables_info').css({'font-family': 'Roboto', 'color': '#333', 'font-size': '12px'});",  # Apply font-family to 'Showing X of Y entries'
-                "$('.dataTables_paginate').css({'font-family': 'Roboto', 'color': '#333', 'font-size': '12px'});", # Apply font-family to pagination
-                "$('.paginate_button').css({'font-family': 'Roboto', 'color': '#333', 'font-size': '12px'});", # Apply font-family to page buttons
+                "if (!document.getElementById('local-font-roboto')) {", 
+                "  var style = document.createElement('style');",
+                "  style.id = 'local-font-roboto';",
+                "  style.type = 'text/css';",
+                "  style.textContent = `@font-face { font-family: 'Roboto'; font-style: normal; font-weight: 400; src: url('/path/to/fonts/roboto.woff2') format('woff2'); }`;",
+                "  document.head.appendChild(style);",
+                "}",
+                "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",
+                "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",
+                "$('thead th').css({'font-family': 'Roboto'});",
+                "$('.dataTables_info, .dataTables_paginate, .paginate_button').css({'font-family': 'Roboto', 'color': '#333', 'font-size': '12px'});",
                 "}"
               )
             )

@@ -68,6 +68,18 @@
             height: 100%;
             border: none;
         }
+
+        table thead th {
+            font-family: 'Roboto', sans-serif;
+            cursor: pointer; /* Show pointer cursor to indicate interactivity */
+            transition: background-color 0.3s, box-shadow 0.3s; /* Smooth hover effect */
+        }
+
+        table thead th:hover {
+            background-color: #007bff; /* Change background color on hover */
+            color: #fff; /* Change text color on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add a shadow for depth */
+        }
     </style>
 </head>
 

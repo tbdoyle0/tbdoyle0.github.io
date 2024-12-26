@@ -146,27 +146,70 @@
             card.addEventListener('click', function() {
                 const filter = this.getAttribute('data-filter');
 
-        // Set default active filter on page load
-        document.addEventListener("DOMContentLoaded", function() {
-            const iframe = document.querySelector('#tableOutput iframe');
-            iframe.src = 'results_all.html'; // Set default iframe source to 'ALL GAMES'
+                // Update the active card styling
+                document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+
+                // Update iframe source based on selected filter
+                const iframe = document.querySelector('#tableOutput iframe');
+                if (filter === 'all') {
+                    iframe.src = 'results_all.html';
+                } else if (filter === 'last') {
+                    iframe.src = 'results_last.html';
+                } else if (filter === 'close') {
+                    iframe.src = 'results_close.html';
+                }
+
+                // Update the browser history state
+                history.pushState({ filter: filter }, '', `#${filter}`);
+            });
         });
 
-        // Update active card styling
-        document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
-        this.classList.add('active');
+        // On page load, check the URL hash and set the active filter
+        document.addEventListener("DOMContentLoaded", function() {
+            const filter = window.location.hash.slice(1) || 'all'; // Default to 'all'
+            const iframe = document.querySelector('#tableOutput iframe');
+            
+            // Set the iframe based on the hash
+            if (filter === 'all') {
+                iframe.src = 'results_all.html';
+            } else if (filter === 'last') {
+                iframe.src = 'results_last.html';
+            } else if (filter === 'close') {
+                iframe.src = 'results_close.html';
+            }
 
-        // Update iframe source based on selected filter
-        const iframe = document.querySelector('#tableOutput iframe');
-        if (filter === 'all') {
-            iframe.src = 'results_all.html';
-        } else if (filter === 'last') {
-            iframe.src = 'results_last.html';
-        } else if (filter === 'close') {
-            iframe.src = 'results_close.html';
-        }
+            // Set the active filter card
+            document.querySelectorAll('.filter-card').forEach(card => {
+                card.classList.remove('active');
+                if (card.getAttribute('data-filter') === filter) {
+                    card.classList.add('active');
+                }
             });
-        });   
+        });
+
+        // Handle back button (popstate)
+        window.addEventListener('popstate', function(event) {
+            const filter = event.state ? event.state.filter : 'all';
+            const iframe = document.querySelector('#tableOutput iframe');
+            
+            // Set the iframe based on the filter
+            if (filter === 'all') {
+                iframe.src = 'results_all.html';
+            } else if (filter === 'last') {
+                iframe.src = 'results_last.html';
+            } else if (filter === 'close') {
+                iframe.src = 'results_close.html';
+            }
+
+            // Set the active filter card
+            document.querySelectorAll('.filter-card').forEach(card => {
+                card.classList.remove('active');
+                if (card.getAttribute('data-filter') === filter) {
+                    card.classList.add('active');
+                }
+            });
+        });  
     </script>
 </body>
 

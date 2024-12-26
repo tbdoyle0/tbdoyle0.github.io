@@ -10,11 +10,15 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
+    <!-- Google Fonts: Roboto -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
     <!-- Include custom CSS -->
     <style>
         html, body {
             height: 100%;
 	    margin: 0;
+            font-family: 'Roboto', sans-serif;
 	}
         h1, h3 {
             font-family: 'Roboto', sans-serif;
@@ -142,27 +146,27 @@
             card.addEventListener('click', function() {
                 const filter = this.getAttribute('data-filter');
 
-                // Set default active filter on page load
-                document.addEventListener("DOMContentLoaded", function() {
-                    const iframe = document.querySelector('#tableOutput iframe');
-                    iframe.src = 'results_all.html'; // Set default iframe source to 'ALL GAMES'
-                });
+        // Set default active filter on page load
+        document.addEventListener("DOMContentLoaded", function() {
+            const iframe = document.querySelector('#tableOutput iframe');
+            iframe.src = 'results_all.html'; // Set default iframe source to 'ALL GAMES'
+        });
 
-                // Update active card styling
-                document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
+        // Update active card styling
+        document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
 
-                // Update iframe source based on selected filter
-                const iframe = document.querySelector('#tableOutput iframe');
-                if (filter === 'all') {
-                    iframe.src = 'results_all.html';
-                } else if (filter === 'last') {
-                    iframe.src = 'results_last.html';
-                } else if (filter === 'close') {
-                    iframe.src = 'results_close.html';
-                }
+        // Update iframe source based on selected filter
+        const iframe = document.querySelector('#tableOutput iframe');
+        if (filter === 'all') {
+            iframe.src = 'results_all.html';
+        } else if (filter === 'last') {
+            iframe.src = 'results_last.html';
+        } else if (filter === 'close') {
+            iframe.src = 'results_close.html';
+        }
             });
-        });    
+        });   
     </script>
 </body>
 

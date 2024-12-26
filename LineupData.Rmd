@@ -383,7 +383,9 @@ results_all <- results_all %>%
             )
   ) %>%
   formatStyle(columns = colnames(results_all),
-              fontFamily = "Roboto")
+              fontFamily = "Roboto",
+              fontSize = "10px",
+              fontWeight = "bold")
 
 results_last <- results_last %>%
       datatable(rownames = FALSE, 
@@ -402,7 +404,9 @@ results_last <- results_last %>%
             )
   ) %>%
   formatStyle(columns = colnames(results_last),
-              fontFamily = "Roboto")
+              fontFamily = "Roboto",
+              fontSize = "10px",
+              fontWeight = "bold")
 
 results_close <- results_close %>%
       datatable(rownames = FALSE, 
@@ -421,7 +425,9 @@ results_close <- results_close %>%
             )
   ) %>%
   formatStyle(columns = colnames(results_close),
-              fontFamily = "Roboto")
+              fontFamily = "Roboto",
+              fontSize = "10px",
+              fontWeight = "bold")
 
 saveWidget(results_all, "results_all.html", selfcontained = TRUE)
 saveWidget(results_last, "results_last.html", selfcontained = TRUE)

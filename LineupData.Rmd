@@ -295,7 +295,7 @@ check_opponent <- sum(master$opponent.score.inc) - opponent_total
 check_leader <- sum(master$team.score.inc[master$player == leader_name], na.rm = TRUE) - leader_total
 
 # Aggregate results for each unique lineup combination and filter option
-results_all <- map_dfr(unique_lineups, function(lineup) {
+results_all_df <- map_dfr(unique_lineups, function(lineup) {
   # Split lineup into names
   lineup_names <- str_split(lineup, ", ") %>% unlist()
 
@@ -318,7 +318,7 @@ results_all <- map_dfr(unique_lineups, function(lineup) {
 }) %>%
   filter(`MINUTES PLAYED` > 0) 
 
-results_last <- map_dfr(unique_lineups, function(lineup) {
+results_last_df <- map_dfr(unique_lineups, function(lineup) {
   # Split lineup into names
   lineup_names <- str_split(lineup, ", ") %>% unlist()
   
@@ -342,7 +342,7 @@ results_last <- map_dfr(unique_lineups, function(lineup) {
 }) %>%
   filter(`MINUTES PLAYED` > 0) 
 
-results_close <- map_dfr(unique_lineups, function(lineup) {
+results_close_df <- map_dfr(unique_lineups, function(lineup) {
   # Split lineup into names
   lineup_names <- str_split(lineup, ", ") %>% unlist()
   
@@ -366,7 +366,7 @@ results_close <- map_dfr(unique_lineups, function(lineup) {
 }) %>%
   filter(`MINUTES PLAYED` > 0)
 
-results_all <- results_all %>%
+results_all <- results_all_df %>%
     datatable(rownames = FALSE, 
             options = list(
               pageLength = 15,
@@ -378,14 +378,16 @@ results_all <- results_all %>%
                 "function(settings, json) {",
                 "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",  # Add placeholder text
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
+                "$('thead th').css({'font-family': 'Roboto'});",  # Apply font-family to headers
+                "$('tfoot th').css({'font-family': 'Roboto'});",  # Apply font-family to footnotes, if present
                 "}"
               )
             )
   ) %>%
-  formatStyle(columns = colnames(results_all),
+  formatStyle(columns = colnames(results_all_df),
               fontFamily = "Roboto")
 
-results_last <- results_last %>%
+results_last <- results_last_df %>%
       datatable(rownames = FALSE, 
             options = list(
               pageLength = 15,
@@ -397,14 +399,16 @@ results_last <- results_last %>%
                 "function(settings, json) {",
                 "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",  # Add placeholder text
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
+                "$('thead th').css({'font-family': 'Roboto'});",  # Apply font-family to headers
+                "$('tfoot th').css({'font-family': 'Roboto'});",  # Apply font-family to footnotes, if present
                 "}"
               )
             )
   ) %>%
-  formatStyle(columns = colnames(results_last),
+  formatStyle(columns = colnames(results_last_df),
               fontFamily = "Roboto")
 
-results_close <- results_close %>%
+results_close <- results_close_df %>%
       datatable(rownames = FALSE, 
             options = list(
               pageLength = 15,
@@ -416,11 +420,13 @@ results_close <- results_close %>%
                 "function(settings, json) {",
                 "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",  # Add placeholder text
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
+                "$('thead th').css({'font-family': 'Roboto'});",  # Apply font-family to headers
+                "$('tfoot th').css({'font-family': 'Roboto'});",  # Apply font-family to footnotes, if present
                 "}"
               )
             )
   ) %>%
-  formatStyle(columns = colnames(results_close),
+  formatStyle(columns = colnames(results_close_df),
               fontFamily = "Roboto")
 
 saveWidget(results_all, "results_all.html", selfcontained = TRUE)

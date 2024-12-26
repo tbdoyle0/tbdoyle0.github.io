@@ -369,7 +369,7 @@ results_close <- map_dfr(unique_lineups, function(lineup) {
 results_all <- results_all %>%
     datatable(rownames = FALSE, 
             options = list(
-              pageLength = 20,
+              pageLength = 15,
               lengthChange = FALSE,
               order = list(list(1, 'desc')),
               columnDefs = list(list(targets = 0, orderable = FALSE)),
@@ -381,12 +381,14 @@ results_all <- results_all %>%
                 "}"
               )
             )
-  )
+  ) %>%
+  formatStyle(columns = colnames(results_all),
+              fontFamily = "Roboto")
 
 results_last <- results_last %>%
       datatable(rownames = FALSE, 
             options = list(
-              pageLength = 20,
+              pageLength = 15,
               lengthChange = FALSE,
               order = list(list(1, 'desc')),
               columnDefs = list(list(targets = 0, orderable = FALSE)),
@@ -398,12 +400,14 @@ results_last <- results_last %>%
                 "}"
               )
             )
-  )
+  ) %>%
+  formatStyle(columns = colnames(results_last),
+              fontFamily = "Roboto")
 
 results_close <- results_close %>%
       datatable(rownames = FALSE, 
             options = list(
-              pageLength = 20,
+              pageLength = 15,
               lengthChange = FALSE,
               order = list(list(1, 'desc')),
               columnDefs = list(list(targets = 0, orderable = FALSE)),
@@ -415,7 +419,9 @@ results_close <- results_close %>%
                 "}"
               )
             )
-  )
+  ) %>%
+  formatStyle(columns = colnames(results_close),
+              fontFamily = "Roboto")
 
 saveWidget(results_all, "results_all.html", selfcontained = TRUE)
 saveWidget(results_last, "results_last.html", selfcontained = TRUE)

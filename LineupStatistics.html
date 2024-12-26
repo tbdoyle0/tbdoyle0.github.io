@@ -84,7 +84,7 @@
         <!-- Filter options as cards -->
         <div class="row justify-content-center mt-3">
             <div class="col-md-2">
-                <div class="card text-center filter-card" data-filter="all">
+                <div class="card text-center filter-card active" data-filter="all">
                     <div class="card-body">
                         <h5 class="card-title">ALL GAMES</h5>
                     </div>
@@ -128,6 +128,12 @@
         document.querySelectorAll('.filter-card').forEach(card => {
             card.addEventListener('click', function() {
                 const filter = this.getAttribute('data-filter');
+
+                // Set default active filter on page load
+                document.addEventListener("DOMContentLoaded", function() {
+                    const iframe = document.querySelector('#tableOutput iframe');
+                    iframe.src = 'results_all.html'; // Set default iframe source to 'ALL GAMES'
+                });
 
                 // Update active card styling
                 document.querySelectorAll('.filter-card').forEach(c => c.classList.remove('active'));

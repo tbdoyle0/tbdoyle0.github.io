@@ -379,7 +379,9 @@ results_all <- results_all_df %>%
                 "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",  # Add placeholder text
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "$('thead th').css({'font-family': 'Roboto'});",  # Apply font-family to headers
-                "$('tfoot th').css({'font-family': 'Roboto'});",  # Apply font-family to footnotes, if present
+                "$('.dataTables_info').css({'font-family': 'Roboto', 'color': '#333'});",  # Apply font-family to 'Showing X of Y entries'
+                "$('.dataTables_paginate').css({'font-family': 'Roboto', 'color': '#333'});", # Apply font-family to pagination
+                "$('.paginate_button').css({'font-family': 'Roboto', 'color': '#333'});", # Apply font-family to page buttons
                 "}"
               )
             )
@@ -400,7 +402,9 @@ results_last <- results_last_df %>%
                 "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",  # Add placeholder text
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "$('thead th').css({'font-family': 'Roboto'});",  # Apply font-family to headers
-                "$('tfoot th').css({'font-family': 'Roboto'});",  # Apply font-family to footnotes, if present
+                "$('.dataTables_info').css({'font-family': 'Roboto', 'color': '#333'});",  # Apply font-family to 'Showing X of Y entries'
+                "$('.dataTables_paginate').css({'font-family': 'Roboto', 'color': '#333'});", # Apply font-family to pagination
+                "$('.paginate_button').css({'font-family': 'Roboto', 'color': '#333'});", # Apply font-family to page buttons
                 "}"
               )
             )
@@ -421,7 +425,9 @@ results_close <- results_close_df %>%
                 "$('div.dataTables_filter input').attr('placeholder', 'SEARCH');",  # Add placeholder text
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "$('thead th').css({'font-family': 'Roboto'});",  # Apply font-family to headers
-                "$('tfoot th').css({'font-family': 'Roboto'});",  # Apply font-family to footnotes, if present
+                "$('.dataTables_info').css({'font-family': 'Roboto', 'color': '#333'});",  # Apply font-family to 'Showing X of Y entries'
+                "$('.dataTables_paginate').css({'font-family': 'Roboto', 'color': '#333'});", # Apply font-family to pagination
+                "$('.paginate_button').css({'font-family': 'Roboto', 'color': '#333'});", # Apply font-family to page buttons
                 "}"
               )
             )

@@ -380,7 +380,13 @@ results_all <- results_all %>%
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "}"
               )
-            )
+            ),
+            callback = JS(
+              "function(settings) {",
+              "$('head').append('<link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap\" rel=\"stylesheet\">');",
+              "$('table').css('font-family', 'Roboto, sans-serif');",  # Apply Roboto font to the table
+              "}"
+              )
   )
 
 results_last <- results_last %>%
@@ -397,7 +403,13 @@ results_last <- results_last %>%
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "}"
               )
-            )
+            ),
+            callback = JS(
+              "function(settings) {",
+              "$('head').append('<link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap\" rel=\"stylesheet\">');",
+              "$('table').css('font-family', 'Roboto, sans-serif');",  # Apply Roboto font to the table
+              "}"
+              )
   )
 
 results_close <- results_close %>%
@@ -414,7 +426,13 @@ results_close <- results_close %>%
                 "$('div.dataTables_filter label').contents().filter(function() { return this.nodeType === 3; }).remove();",  # Remove the "Search:" text
                 "}"
               )
-            )
+            ),
+            callback = JS(
+              "function(settings) {",
+              "$('head').append('<link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap\" rel=\"stylesheet\">');",
+              "$('table').css('font-family', 'Roboto, sans-serif');",  # Apply Roboto font to the table
+              "}"
+              )
   )
 
 saveWidget(results_all, "results_all.html", selfcontained = TRUE)

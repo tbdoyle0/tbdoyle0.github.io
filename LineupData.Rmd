@@ -338,8 +338,7 @@ results_last_df <- map_dfr(unique_lineups, function(lineup) {
          "POINT SCORED" = summary_stats$total_scored,
          "POINTS ALLOWED" = summary_stats$total_against,
          "+/-" = summary_stats$total_net)
-}) %>%
-  filter(`MINUTES PLAYED` > 0) 
+}) 
 
 results_close_df <- map_dfr(unique_lineups, function(lineup) {
   # Split lineup into names

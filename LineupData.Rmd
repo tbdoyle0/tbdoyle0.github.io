@@ -23,10 +23,10 @@ last_update <- format(Sys.time(), format = "%B %d, %Y at %I:%M%p")
 schedule_site <- "https://athletics.hamilton.edu/sports/mens-basketball/schedule"
 main_site <- "https://athletics.hamilton.edu"
 team_id <- c("ham", "hamilton", "hamilton college") # Need to look through play-by-play column heading to identify all variations
-team_total <- 1152
-opponent_total <- 1038
+team_total <- 1319
+opponent_total <- 1158
 leader_name <- "H. MORGAN"
-leader_total <- 341
+leader_total <- 386
 box_score_id <- "Hamilton"   # Find unique identifier for school name that will map to the proper team in the box score
 title <- "Hamilton College"
 subtitle <- "Men's Basketball"
